@@ -2,21 +2,50 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <!-- レスポンシブ対応➀パソコンでの表示が縮小された状態で表示されてしまうのでmetaを入力する -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Day1 Todo App</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f9f9f9; }
-    h1 { color: #333; }
+    h1 { color: #333; font-size: 40px; }
     input { width: 70%; padding: 12px; font-size: 18px; border: 1px solid #ccc; border-radius: 8px; }
     button { padding: 12px 24px; font-size: 18px; background: #0070f3; color: white; border: none; border-radius: 8px; cursor: pointer; }
     ul { list-style: none; padding: 0; }
     li { margin: 12px 0; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
     .done { text-decoration: line-through; opacity: 0.6; }
     .delete { cursor: pointer; font-size: 20px; }
+
+    /* ➁レスポンシブ対応 */
+    @media screen and (max-width:480px) {
+      h1{
+        font-size: 20px;
+        
+      }
+
+      input {
+        width: 50%;
+        padding: 5px;
+        font-size: 9px;
+
+      }
+      button {
+        padding: 6px 12px;
+        font-size: 9px;
+        
+      }
+
+      ul {
+        width: 70%;
+      }
+
+      .delete {font-size: 10px; }
+
+    }
+
   </style>
 </head>
 <body>
-  <h1>Day1 Todoアプリ完成！</h1>
+  <h1>Day1 Todoアプリ完成!</h1>
   <input type="text" id="taskInput" placeholder="新しいタスクを入力">
   <button onclick="addTask()">追加</button>
   <ul id="taskList"></ul>
