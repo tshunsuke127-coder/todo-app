@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day1 Todo App</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f9f9f9; }
+    h1 { color: #333; }
+    input { width: 70%; padding: 12px; font-size: 18px; border: 1px solid #ccc; border-radius: 8px; }
+    button { padding: 12px 24px; font-size: 18px; background: #0070f3; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 12px 0; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+    .done { text-decoration: line-through; opacity: 0.6; }
+    .delete { cursor: pointer; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Day1 Todoアプリ完成！</h1>
+  <input type="text" id="taskInput" placeholder="新しいタスクを入力">
+  <button onclick="addTask()">追加</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    const input = document.getElementById('taskInput');
+    const list = document.getElementById('taskList');
+    
+    // ページ読み込み時に保存されたタスクを復元
+    const savedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    savedTasks.forEach(task => addTaskToDOM(task.text, task.done));
+
+    function addTask() {
+      const text = input.value.trim();
+      if (!text) return;
+      addTaskToDOM(text, false);
+      saveTasks();
+      input.value = '';
+    }
+
+    function addTaskToDOM(text, done) {
+      const li = document.createElement('li');
+      li.textContent = text;
+      if (done) li.classList.add('done');
+
+      // 完了トグル
+      li.onclick = () => {
+        li.classList.toggle('done');
+        saveTasks();
+      };
+
+      // 削除ボタン
+      const del = document.createElement('span');
+      del.textContent = ' ❌';
+      del.className = 'delete';
+      del.onclick = (e) => {
+        e.stopPropagation();
+        li.remove();
+        saveTasks();
+      };
+      li.appendChild(del);
+      list.appendChild(li);
+    }
+
+    function saveTasks() {
+      const tasks = Array.from(list.children).map(li => ({
+        text: li.textContent.replace(' ❌', ''),
+        done: li.classList.contains('done')
+      }));
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Enterキーでも追加できるように
+    input.addEventListener('keypress', e => e.key === 'Enter' && addTask());
+  </script>
+</body>
+</html>
