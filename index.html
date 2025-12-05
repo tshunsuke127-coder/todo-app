@@ -76,6 +76,22 @@
     <input type="date" id="dueDateInput" style="padding:10px;font-size:16px;border-radius:8px;border:1px solid #ccc;">
   </div>
 
+  <!-- 期限入力の下にこれ追加（カテゴリ選択） -->
+<div style="text-align:center;margin:15px 0;">
+  <select id="categoryInput" style="padding:10px;font-size:16px;border-radius:8px;">
+    <option value="work">仕事（赤）</option>
+    <option value="private">プライベート（青）</option>
+    <option value="other" selected>その他（緑）</option>
+  </select>
+</div>
+
+<!-- 今日の日付の下にこれ追加（完了タスク非表示スイッチ） -->
+<div style="text-align:center;margin:20px 0;">
+  <label style="font-size:18px;color:#0070f3;font-weight:bold;">
+    <input type="checkbox" id="hideDone"> 完了タスクを非表示
+  </label>
+</div>
+
 
   <script>
 
@@ -93,47 +109,66 @@
     savedTasks.forEach(task => addTaskToDOM(task.text, task.done));
 
         // addTask関数をまるごとこれに置き換え（期限も保存）
-    function addTask() {
-      const text = input.value.trim();
-      const dueDate = document.getElementById('dueDateInput').value;
-      if (!text) return;
-      addTaskToDOM(text, false, dueDate || null);
-      saveTasks();
-      input.value = '';
-      document.getElementById('dueDateInput').value = ''; // リセット
-    }
-
-    // addTaskToDOM関数もこれに置き換え
-    function addTaskToDOM(text, done, due) {
-      const li = document.createElement('li');
-      let displayText = text;
-      if (due) {
-        displayText += `  [期限: ${due}]`;
-        if (new Date(due) < new Date().setHours(0,0,0,0)) {
-          li.style.color = '#d32f2f';
-          displayText += ' ←超過';
-        }
+    // addTask 関数も少し修正（カテゴリ取得）
+      function addTask() {
+        const text = input.value.trim();
+        const dueDate = document.getElementById('dueDateInput').value;
+        const category = document.getElementById('categoryInput').value;
+        if (!text) return;
+        addTaskToDOM(text, false, dueDate || null, category);
+        saveTasks();
+        input.value = '';
+        document.getElementById('dueDateInput').value = '';
       }
-      li.textContent = displayText;
-      if (done) li.classList.add('done');
 
-      li.onclick = () => { li.classList.toggle('done'); saveTasks(); };
+      
+      // addTaskToDOM の第3引数に category 追加（関数の最初の方をこれに置き換え）
+      function addTaskToDOM(text, done, due, category = 'other') {
+        const li = document.createElement('li');
+        let displayText = text;
+        
+        // 期限表示
+        if (due) {
+          displayText += `  [期限: ${due}]`;
+          if (new Date(due + "T23:59:59") < new Date()) {
+            li.style.color = '#d32f2f';
+            displayText += ' ←超過';
+          }
+        }
+        
+        // カテゴリ色付け
+        const colors = { work: '#d32f2f', private: '#1976d2', other: '#388e3c' };
+        li.style.borderLeft = `8px solid ${colors[category]}`;
+        li.style.paddingLeft = '16px';
+        
+        li.textContent = displayText;
+        if (done) li.classList.add('done');
 
-      const del = document.createElement('span');
-      del.textContent = ' ❌';
-      del.className = 'delete';
-      del.onclick = (e) => { e.stopPropagation(); li.remove(); saveTasks(); };
-      li.appendChild(del);
-      list.appendChild(li);
-    }
+        // 完了トグル
+        li.onclick = () => { li.classList.toggle('done'); saveTasks(); updateVisibility(); };
 
-    function saveTasks() {
-      const tasks = Array.from(list.children).map(li => ({
-        text: li.textContent.replace(' ❌', ''),
-        done: li.classList.contains('done')
-      }));
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
+        // 削除ボタン
+        const del = document.createElement('span');
+        del.textContent = ' ❌';
+        del.className = 'delete';
+        del.onclick = (e) => { e.stopPropagation(); li.remove(); saveTasks(); };
+        li.appendChild(del);
+        list.appendChild(li);
+        updateVisibility();
+      }
+
+      // 完了非表示機能
+      function updateVisibility() {
+        const hide = document.getElementById('hideDone').checked;
+        document.querySelectorAll('li').forEach(li => {
+          if (hide && li.classList.contains('done')) {
+            li.style.display = 'none';
+          } else {
+            li.style.display = '';
+          }
+        });
+      }
+document.getElementById('hideDone').addEventListener('change', updateVisibility);
 
     // Enterキーでも追加できるように
     input.addEventListener('keypress', e => e.key === 'Enter' && addTask());
