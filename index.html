@@ -60,6 +60,9 @@
 
   </style>
 </head>
+
+<script src="src/script.js" defer></script>
+
 <body>
   <h1>Day1 Todoアプリ完成!</h1>
   <input type="text" id="taskInput" placeholder="新しいタスクを入力">
@@ -85,6 +88,16 @@
   </select>
 </div>
 
+<!-- カテゴリの下にこれ追加（優先度選択） -->
+<div style="text-align:center;margin:15px 0;">
+  <select id="priorityInput" style="padding:10px;font-size:16px;border-radius:8px;">
+    <option value="high">🔴 高</option>
+    <option value="medium" selected>🟡 中</option>
+    <option value="low">🟢 低</option>
+  </select>
+  <button onclick="sortTasks()" style="padding:10px 20px;margin-left:10px;">並べ替え</button>
+</div>
+
 <!-- 今日の日付の下にこれ追加（完了タスク非表示スイッチ） -->
 <div style="text-align:center;margin:20px 0;">
   <label style="font-size:18px;color:#0070f3;font-weight:bold;">
@@ -93,85 +106,7 @@
 </div>
 
 
-  <script>
-
-    // scriptタグの中の一番上にこれ追加（今日の日付＋曜日）
-    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-    const today = new Date();
-    document.getElementById('today').textContent = 
-      `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${weekdays[today.getDay()]}）`;
-
-    const input = document.getElementById('taskInput');
-    const list = document.getElementById('taskList');
     
-    // ページ読み込み時に保存されたタスクを復元
-    const savedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-    savedTasks.forEach(task => addTaskToDOM(task.text, task.done));
 
-        // addTask関数をまるごとこれに置き換え（期限も保存）
-    // addTask 関数も少し修正（カテゴリ取得）
-      function addTask() {
-        const text = input.value.trim();
-        const dueDate = document.getElementById('dueDateInput').value;
-        const category = document.getElementById('categoryInput').value;
-        if (!text) return;
-        addTaskToDOM(text, false, dueDate || null, category);
-        saveTasks();
-        input.value = '';
-        document.getElementById('dueDateInput').value = '';
-      }
-
-      
-      // addTaskToDOM の第3引数に category 追加（関数の最初の方をこれに置き換え）
-      function addTaskToDOM(text, done, due, category = 'other') {
-        const li = document.createElement('li');
-        let displayText = text;
-        
-        // 期限表示
-        if (due) {
-          displayText += `  [期限: ${due}]`;
-          if (new Date(due + "T23:59:59") < new Date()) {
-            li.style.color = '#d32f2f';
-            displayText += ' ←超過';
-          }
-        }
-        
-        // カテゴリ色付け
-        const colors = { work: '#d32f2f', private: '#1976d2', other: '#388e3c' };
-        li.style.borderLeft = `8px solid ${colors[category]}`;
-        li.style.paddingLeft = '16px';
-        
-        li.textContent = displayText;
-        if (done) li.classList.add('done');
-
-        // 完了トグル
-        li.onclick = () => { li.classList.toggle('done'); saveTasks(); updateVisibility(); };
-
-        // 削除ボタン
-        const del = document.createElement('span');
-        del.textContent = ' ❌';
-        del.className = 'delete';
-        del.onclick = (e) => { e.stopPropagation(); li.remove(); saveTasks(); };
-        li.appendChild(del);
-        list.appendChild(li);
-        updateVisibility();
-      }
-
-      // 完了非表示機能
-      function updateVisibility() {
-        const hide = document.getElementById('hideDone').checked;
-        document.querySelectorAll('li').forEach(li => {
-          if (hide && li.classList.contains('done')) {
-            li.style.display = 'none';
-          } else {
-            li.style.display = '';
-          }
-        });
-      }
-document.getElementById('hideDone').addEventListener('change', updateVisibility);
-
-    // Enterキーでも追加できるように
-    input.addEventListener('keypress', e => e.key === 'Enter' && addTask());
-  </script>
 </body>
 </html>
