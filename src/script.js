@@ -1,26 +1,24 @@
 <script>
-    {/* // script.jsの一番上にこれを追加（超重要！） */}
+   // src/script.js 全体をこれで囲む（全部のコードを中に入れる）
 document.addEventListener('DOMContentLoaded', () => {
-
- // ==================== 【1】今日の日付表示 ====================
+  
+  // 【1】今日の日付表示
   const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
   const today = new Date();
   document.getElementById('today').textContent = 
     `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${weekdays[today.getDay()]}）`;
 
-  // ==================== 【2】変数キャッシュ ====================
+  // 【2】変数キャッシュ
   const input = document.getElementById('taskInput');
   const list  = document.getElementById('taskList');
 
-  /* ==================== 【3】保存データ復元 ==================== */
-  // これもそのまま
+  // 【3】保存データ復元
   const savedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
   savedTasks.forEach(task => 
     addTaskToDOM(task.text, task.done, task.due || null, task.category || 'other')
   );
 
-  /* ==================== 【4】addTask関数 ==================== */
-  // ここから関数定義開始（既存のaddTaskがあれば上書き）
+  // 【4】addTask関数
   function addTask() {
     const text     = input.value.trim();
     const dueDate  = document.getElementById('dueDateInput').value;
@@ -33,8 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('dueDateInput').value = '';
   }
 
-  /* ==================== 【5】addTaskToDOM関数 ==================== */
-  // 既存のaddTaskToDOMを全部消して、これに置き換え
+  // 【5】addTaskToDOM関数
   function addTaskToDOM(text, done, due, category = 'other') {
     const li = document.createElement('li');
     let displayText = text;
@@ -74,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateVisibility();
   }
 
-  /* ==================== 【6】完了非表示 ==================== */
+  // 【6】完了非表示
   function updateVisibility() {
     const hide = document.getElementById('hideDone').checked;
     document.querySelectorAll('li').forEach(li => {
@@ -87,8 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.getElementById('hideDone').addEventListener('change', updateVisibility);
 
-  /* ==================== 【7】saveTasks関数 ==================== */
-  // 既存のsaveTasksがあれば上書き
+  // 【7】saveTasks関数
   function saveTasks() {
     const tasks = Array.from(list.children).map(li => ({
       text: li.textContent
@@ -104,11 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
-  /* ==================== 【8】Enterキー対応 ==================== */
+  // 【8】Enterキー対応
   input.addEventListener('keypress', e => {
     if (e.key === 'Enter') addTask();
   });
 
-  }); 
-  {/* ↑ DOMContentLoadedの閉じカッコ */}
+}); // ← これで閉じる（超重要！）
 </script>
