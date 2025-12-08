@@ -1,24 +1,22 @@
-<script>
-   // src/script.js 全体をこれで囲む（全部のコードを中に入れる）
 document.addEventListener('DOMContentLoaded', () => {
-  
-  // 【1】今日の日付表示
+
+  // === 今日の日付 ===
   const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
   const today = new Date();
   document.getElementById('today').textContent = 
     `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${weekdays[today.getDay()]}）`;
 
-  // 【2】変数キャッシュ
+  // === 要素キャッシュ ===
   const input = document.getElementById('taskInput');
   const list  = document.getElementById('taskList');
 
-  // 【3】保存データ復元
+  // === 保存復元 ===
   const savedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
   savedTasks.forEach(task => 
-    addTaskToDOM(task.text, task.done, task.due || null, task.category || 'other')
+    addTaskToDOM(task.text, task.done, task.due, task.category)
   );
 
-  // 【4】addTask関数
+  // === addTask（外から呼べるように公開） ===
   function addTask() {
     const text     = input.value.trim();
     const dueDate  = document.getElementById('dueDateInput').value;
@@ -27,36 +25,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addTaskToDOM(text, false, dueDate || null, category);
     saveTasks();
+
     input.value = '';
     document.getElementById('dueDateInput').value = '';
   }
+  window.addTask = addTask;  // ← 重要
 
-  // 【5】addTaskToDOM関数
+  // === DOM追加 ===
   function addTaskToDOM(text, done, due, category = 'other') {
     const li = document.createElement('li');
-    let displayText = text;
 
+    // タスク名は span に入れる（保存が安定）
+    const nameSpan = document.createElement('span');
+    nameSpan.className = "taskName";
+    nameSpan.textContent = text;
+
+    // 期限表示
+    const dueSpan = document.createElement('span');
     if (due) {
-      displayText += `  [期限: ${due}]`;
+      dueSpan.textContent = ` [期限: ${due}]`;
+
       if (new Date(due + "T23:59:59") < new Date()) {
         li.style.color = '#d32f2f';
-        displayText += ' ←超過';
+        dueSpan.textContent += ' ←超過';
       }
     }
 
+    // カテゴリ色
     const colors = { work: '#d32f2f', private: '#1976d2', other: '#388e3c' };
     li.style.borderLeft = `8px solid ${colors[category]}`;
     li.style.paddingLeft = '16px';
+    li.dataset.category = category;
 
-    li.textContent = displayText;
+    // 完了状態
     if (done) li.classList.add('done');
 
+    // 完了トグル
     li.onclick = () => {
       li.classList.toggle('done');
       saveTasks();
       updateVisibility();
     };
 
+    // 削除ボタン
     const del = document.createElement('span');
     del.textContent = '削除';
     del.className = 'delete';
@@ -65,45 +76,57 @@ document.addEventListener('DOMContentLoaded', () => {
       li.remove();
       saveTasks();
     };
-    li.appendChild(del);
 
+
+
+    // DOM構築
+    li.appendChild(nameSpan);
+    li.appendChild(dueSpan);
+    li.appendChild(del);
     list.appendChild(li);
+
     updateVisibility();
   }
 
-  // 【6】完了非表示
+  // === 完了非表示 ===
   function updateVisibility() {
     const hide = document.getElementById('hideDone').checked;
     document.querySelectorAll('li').forEach(li => {
-      if (hide && li.classList.contains('done')) {
-        li.style.display = 'none';
-      } else {
-        li.style.display = '';
-      }
+      li.style.display = (hide && li.classList.contains('done')) ? 'none' : '';
     });
   }
   document.getElementById('hideDone').addEventListener('change', updateVisibility);
 
-  // 【7】saveTasks関数
+  // === 保存 ===
   function saveTasks() {
     const tasks = Array.from(list.children).map(li => ({
-      text: li.textContent
-               .replace('削除', '')
-               .replace(/ \[期限: .*\]/, '')
-               .replace(' ←超過', '')
-               .trim(),
+      text: li.querySelector('.taskName').textContent,
       done: li.classList.contains('done'),
-      due: li.textContent.match(/\[期限: ([0-9\-]+)\]/)?.[1] || null,
-      category: li.style.borderLeft.includes('205,50,50') ? 'work' :
-                li.style.borderLeft.includes('25,118,210') ? 'private' : 'other'
+      due : li.textContent.match(/\[期限: ([0-9\-]+)/)?.[1] || null,
+      category: li.dataset.category
     }));
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
-  // 【8】Enterキー対応
+  // === Enterキー ===
   input.addEventListener('keypress', e => {
     if (e.key === 'Enter') addTask();
   });
 
-}); // ← これで閉じる（超重要！）
-</script>
+  function sortTasks() {
+  const items = Array.from(list.children);
+
+  // 完了してないタスク → 完了済みの順に変更
+  items.sort((a, b) => {
+    const doneA = a.classList.contains('done') ? 1 : 0;
+    const doneB = b.classList.contains('done') ? 1 : 0;
+    return doneA - doneB; 
+  });
+
+  items.forEach(li => list.appendChild(li));
+  saveTasks();
+}
+window.sortTasks = sortTasks;  // ← HTML から呼べるように
+
+});
+

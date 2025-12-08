@@ -65,48 +65,40 @@
 
 <body>
   <h1>Day1 Todoアプリ完成!</h1>
-  <input type="text" id="taskInput" placeholder="新しいタスクを入力">
-  <button onclick="addTask()">追加</button>
-  <ul id="taskList"></ul>
-
-  <!-- h1の下にこれを追加（今日の日付表示） -->
+  
+  <!-- 今日の日付表示 -->
   <div style="text-align:center;color:#0070f3;font-size:18px;margin:15px 0;font-weight:bold;">
     今日: <span id="today"></span>
   </div>
-
-  <!-- 入力欄のすぐ下にこれ追加（期限日付入力） -->
-  <div style="text-align:center;margin:10px 0;">
-    <input type="date" id="dueDateInput" style="padding:10px;font-size:16px;border-radius:8px;border:1px solid #ccc;">
-  </div>
-
-  <!-- 期限入力の下にこれ追加（カテゴリ選択） -->
-<div style="text-align:center;margin:15px 0;">
-  <select id="categoryInput" style="padding:10px;font-size:16px;border-radius:8px;">
-    <option value="work">仕事（赤）</option>
-    <option value="private">プライベート（青）</option>
-    <option value="other" selected>その他（緑）</option>
-  </select>
-</div>
-
-<!-- カテゴリの下にこれ追加（優先度選択） -->
-<div style="text-align:center;margin:15px 0;">
-  <select id="priorityInput" style="padding:10px;font-size:16px;border-radius:8px;">
-    <option value="high">🔴 高</option>
-    <option value="medium" selected>🟡 中</option>
-    <option value="low">🟢 低</option>
-  </select>
-  <button onclick="sortTasks()" style="padding:10px 20px;margin-left:10px;">並べ替え</button>
-</div>
-
-<!-- 今日の日付の下にこれ追加（完了タスク非表示スイッチ） -->
-<div style="text-align:center;margin:20px 0;">
-  <label style="font-size:18px;color:#0070f3;font-weight:bold;">
-    <input type="checkbox" id="hideDone"> 完了タスクを非表示
-  </label>
-</div>
-
-<script src="src/script.js"></script>
+  
+  <!-- 入力フォーム（これがないと追加できない！） -->
+  <div style="text-align:center;">
+    <input type="text" id="taskInput" placeholder="新しいタスクを入力" style="width:70%;padding:12px;">
+    <input type="date" id="dueDateInput" style="padding:10px;">
+    <select id="categoryInput" style="padding:10px;">
+      <option value="work">仕事（赤）</option>
+      <option value="private">プライベート（青）</option>
+      <option value="other" selected>その他（緑）</option>
+    </select>
+    <select id="priorityInput" style="padding:10px;">
+      <option value="high">🔴 高</option>
+      <option value="medium" selected>🟡 中</option>
+      <option value="low">🟢 低</option>
+    </select>
+    <button onclick="addTask()" style="padding:10px 20px;">追加</button>
     
 
+  </div>
+  
+  <!-- 非表示スイッチ -->
+  <div style="text-align:center;margin:20px 0;">
+    <label><input type="checkbox" id="hideDone"> 完了タスクを非表示</label>
+  </div>
+  
+  <!-- タスクリスト（これがないと追加しても表示されない！） -->
+  <ul id="taskList"></ul>
+  
+  <!-- JS読み込み（defer削除で即実行） -->
+  <script src="src/script.js"></script>
 </body>
 </html>
