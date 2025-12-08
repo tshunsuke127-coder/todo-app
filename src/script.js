@@ -1,13 +1,14 @@
 <script>
-  /* ==================== 【1】今日の日付表示 ==================== */
-  // ここは一番上にそのまま貼る
+    {/* // script.jsの一番上にこれを追加（超重要！） */}
+document.addEventListener('DOMContentLoaded', () => {
+
+ // ==================== 【1】今日の日付表示 ====================
   const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
   const today = new Date();
   document.getElementById('today').textContent = 
     `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${weekdays[today.getDay()]}）`;
 
-  /* ==================== 【2】変数キャッシュ ==================== */
-  // そのまま次に続ける
+  // ==================== 【2】変数キャッシュ ====================
   const input = document.getElementById('taskInput');
   const list  = document.getElementById('taskList');
 
@@ -107,4 +108,7 @@
   input.addEventListener('keypress', e => {
     if (e.key === 'Enter') addTask();
   });
+
+  }); 
+  {/* ↑ DOMContentLoadedの閉じカッコ */}
 </script>
