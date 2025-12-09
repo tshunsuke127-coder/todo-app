@@ -88,15 +88,22 @@ function createTaskElement(text, done, due, category = 'other', priority = 'medi
     e.stopPropagation();   // ← 超重要！親のクリックイベントをキャンセル（完了にならないように！）
     li.remove();           // ← 画面から消す
     saveToStorage();       // ← 消えたことも保存
-  });
+  });  
 
-  // ⑫ 作ったタスクをリストに追加 → やっと画面に表示される！！
-  list.appendChild(li);
+  // ⑫ ドラッグ＆ドロップで並べ替えできるようにする（今日の神機能！）
+  li.draggable = true;
 
-  // ⑬ 「完了タスク非表示」がオンなら、完了タスクを隠す
+  // ⑬超過タスク自動後回し機能
+  if (due && new Date(due + "T23:59:59") < new Date()){
+    li.style.opacity = '0.6' ; //超過タスクはちょっと薄くする
+    li.classList.add('overdue'); //超過マーク
+    list.appendChild(li);      //作ったタスクをリストに追加　超過は一番下に強制移動
+  }else {
+    list.insertBefore(li,list.firstChild);      //通常タスクは一番上に追加（最新が上に来る！）
+  }
+  
+  //⑭「完了タスク非表示」がオンなら、完了タスクを隠す
   updateVisibility();
-
-  // ⑭ ドラッグ＆ドロップで並べ替えできるようにする（今日の神機能！）
   li.draggable = true;
 
   // ──────────────────────────────────────────────
@@ -207,9 +214,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // 【今日の日付表示】
   const weekdays = ['日','月','火','水','木','金','土']; // 曜日リスト
   const today = new Date(); // 今日の日付を取得
-  document.getElementById('today').textContent = 
-    `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${weekdays[today.getDay()]}）`;
-    //today.getMonth()+1 （月は0から始まるから+1！）
+  //日本時間で今日の日付を正確に取得
+  const jstDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+  const year = jstDate.getFullYear();
+  const month =jstDate.getMonth() + 1 ;
+  const date = jstDate.getDate();
+  const dayOfWeek =weekdays[jstDate.getDay()];
+
+  document.getElementById('today').textContent =
+    `${year}年${month}月${date}日(${dayOfWeek})`;
+
+    
 
   // 【グローバル変数にDOM要素を代入】（ここでinputとlistに実体が入る！）
   //→ それまでの関数（addTaskとか）は「まだ中身ないけど、将来使うよ」って予約してただけ
@@ -239,5 +254,31 @@ document.addEventListener('DOMContentLoaded', () => {
   input.addEventListener('keypress', e => e.key === 'Enter' && addTask());
   //→ e.key === 'Enter' でEnterキーだけ反応
   //→ && addTask() で条件が真なら即実行（超スマートな書き方！）
+
+  //今日のタスクを教えてくれる神通知
+  const todayStr = new Date(new Date().getTime() + 9 * 60 * 60 * 1000)// → 今日の日付を取得「例2025-12-31」の形に変換
+                  .toISOString().split('T')[0]; 
+  const todayTasks = saved.filter(task =>{
+    return task.due === todayStr && !task.done;
+    
+  });
+
+  // → 保存されてるタスクの中から
+  //    ① 期限が今日　かつ　② まだ完了してない（done = false）のものだけを全部抜き出す
+
+   // 今日やるべきタスクが1個以上あったら通知する！！
+  if (todayTasks.length > 0) {
+  const names = todayTasks.map(t => t.text).join(' ・ ');
+    // → タスク名を「顔洗う ・ 歯を磨く ・ 着替える」みたいにキレイにつなげる
+    
+
+    setTimeout(() =>{
+      // ページが完全に表示されてから0.8秒後にアラートを出す（見た目がスムーズ！）
+      alert(`今日もクリアするぞ（${todayTasks.length}個）\n\n${names}\n\n1個ずつ、確実に。`);
+    },800);
+    // → 800ミリ秒 = 0.8秒待つ
+  } else{
+    console.log('今日はタスクない！ゆっくり寝てていい！！');
+  }
 
 });

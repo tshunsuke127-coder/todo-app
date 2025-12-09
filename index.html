@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo App - 完動版</title>
+  <title>ClearTodo - シンプルTodo</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
     h1 { text-align: center; color: #333; }
@@ -20,11 +20,15 @@
     .done { text-decoration: line-through; opacity: 0.6; }
     .delete { cursor: pointer; font-size: 20px; }
     .today { text-align: center; font-weight: bold; color: #0070f3; font-size: 18px; margin: 20px 0; }
+    li.overdue {opacity: 0.6;font-style: italic;}
   </style>
 </head>
 <body>
 
-  <h1>Day1 Todoアプリ完成!</h1>
+  <h1>ClearTodo</h1>
+  <p style="color:#666; margin-top:8px; font-size:14px;">
+  今日も1個ずつ、確実にクリアしていこう。
+  </p>
   <div class="today">今日: <span id="today"></span></div>
 
   <div class="controls">
