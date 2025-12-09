@@ -2,104 +2,55 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <!-- レスポンシブ対応➀パソコンでの表示が縮小された状態で表示されてしまうのでmetaを入力する -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Day1 Todo App</title>
+  <title>Todo App - 完動版</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f9f9f9; }
-    h1 { color: #333; font-size: 40px; }
-    input { width: 70%; padding: 12px; font-size: 18px; border: 1px solid #ccc; border-radius: 8px; }
-    button { padding: 12px 24px; font-size: 18px; background: #0070f3; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
+    h1 { text-align: center; color: #333; }
+    .controls { text-align: center; margin: 20px 0; }
+    input, select, button { padding: 10px; margin: 5px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; }
+    button { background: #0070f3; color: white; border: none; cursor: pointer; }
+    button:hover { background: #005edc; }
     ul { list-style: none; padding: 0; }
-    li { margin: 12px 0; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+    li { 
+      padding: 16px; margin: 10px 0; background: white; border-radius: 10px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;
+      transition: all 0.3s;
+    }
     .done { text-decoration: line-through; opacity: 0.6; }
     .delete { cursor: pointer; font-size: 20px; }
-
-    /* ➁レスポンシブ対応 */
-    @media screen and (max-width:480px) {
-
-      
-
-      h1{
-        font-size: 20px;
-        color: #0070f3;
-      }
-
-      input {
-        width: 50%;
-        padding: 5px;
-        font-size: 9px;
-
-      }
-      button {
-        padding: 6px 12px;
-        font-size: 9px;
-        
-      }
-
-      ul {
-        width: 70%;
-      }
-
-      .delete {font-size: 10px; }
-
-    
-
-    }
-
-    /* 拡張レスポンシブ: 横持ちもカバー（768pxまで） */
-    @media screen and (max-width: 768px) {
-      body { padding: 10px; margin: 0; }  /* 全体の余白をスマホ最適化 */
-      h1 { font-size: 20px; color: #0070f3; }
-      input { width: 60%; font-size: 16px; }  /* 入力欄も小さく */
-      button { width: 35%; padding: 15px; }   /* ボタンも調整 */
-      li { flex-direction: column; align-items: flex-start; }  /* リストを縦並び（横持ちで崩れ防止） */
-      .delete { margin-top: 10px; }  /* 削除ボタンを下に移動 */
-    }
-
-
+    .today { text-align: center; font-weight: bold; color: #0070f3; font-size: 18px; margin: 20px 0; }
   </style>
 </head>
-
-
-
 <body>
-  <body>
+
   <h1>Day1 Todoアプリ完成!</h1>
-  
-  <!-- 今日の日付表示 -->
-  <div style="text-align:center;color:#0070f3;font-size:18px;margin:15px 0;font-weight:bold;">
-    今日: <span id="today"></span>
-  </div>
-  
-  <!-- 入力フォーム（これがないと追加できない！） -->
-  <div style="text-align:center;">
-    <input type="text" id="taskInput" placeholder="新しいタスクを入力" style="width:70%;padding:12px;">
-    <input type="date" id="dueDateInput" style="padding:10px;">
-    <select id="categoryInput" style="padding:10px;">
+  <div class="today">今日: <span id="today"></span></div>
+
+  <div class="controls">
+    <input type="text" id="taskInput" placeholder="タスクを入力">
+    <input type="date" id="dueDateInput">
+    <select id="categoryInput">
       <option value="work">仕事（赤）</option>
       <option value="private">プライベート（青）</option>
       <option value="other" selected>その他（緑）</option>
     </select>
-    <select id="priorityInput" style="padding:10px;">
-      <option value="high">🔴 高</option>
-      <option value="medium" selected>🟡 中</option>
-      <option value="low">🟢 低</option>
+    <select id="priorityInput">
+      <option value="high">高</option>
+      <option value="medium" selected>中</option>
+      <option value="low">低</option>
     </select>
-    <button onclick="addTask()" style="padding:10px 20px;">追加</button>
-    <button onclick="sortTasks()" style="padding:10px 20px;">並べ替え</button>
+    <button onclick="addTask()">追加</button>
+    <button onclick="sortTasks()">優先度で並べ替え</button>
   </div>
-  
-  <!-- 非表示スイッチ -->
-  <div style="text-align:center;margin:20px 0;">
+
+  <div style="text-align:center;margin:20px;">
     <label><input type="checkbox" id="hideDone"> 完了タスクを非表示</label>
   </div>
-  
-  <!-- タスクリスト（これがないと追加しても表示されない！） -->
-  <ul id="taskList"></ul>
-  
-  <!-- JS読み込み（defer削除で即実行） -->
-  <script src="src/script.js"defer></script>
 
+  <ul id="taskList"></ul>
+
+  <!-- ここにJSを読み込む（deferなしで確実に動く） -->
+  <script src="src/script.js"></script>
 </body>
 </html>
